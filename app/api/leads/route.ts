@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// TODO: substituir pela URL gerada ao publicar o Apps Script como Web App
-// (Extensões > Apps Script > Implantar > Nova implantação > App da Web).
-const WEBHOOK_URL = 'https://script.google.com/macros/s/PLACEHOLDER/exec';
+const WEBHOOK_URL =
+  'https://script.google.com/macros/s/AKfycbz3jiR6VhNnoDolrriDBWTugP_BRlisHT-ymHc7s4WaIa09jr2q-GgCt7B-dc6o2q7d2g/exec';
 
 export async function POST(request: NextRequest) {
   try {
