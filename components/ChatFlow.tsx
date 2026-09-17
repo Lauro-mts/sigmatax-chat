@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import ChatBubble from './ChatBubble';
+import ChatHeader from './ChatHeader';
 import TypingBubble from './TypingBubble';
 import ChoiceButtons from './ChoiceButtons';
 import ChatInput from './ChatInput';
@@ -10,6 +11,7 @@ import { DEBT_OPTIONS, isQualified } from '@/lib/qualification';
 import { sendLead } from '@/lib/sheets';
 import { trackLead } from '@/lib/pixel';
 import { maskCNPJ, maskPhone } from '@/lib/phone';
+import { formatText } from '@/lib/formatText';
 
 const WHATSAPP_URL =
   'https://wa.me/5511913759889?text=Ol%C3%A1%2C%20tenho%20d%C3%ADvida%20tribut%C3%A1ria%20e%20gostaria%20de%20agendar%20uma%20reuni%C3%A3o...';
@@ -29,6 +31,25 @@ const nextId = () => `m${idCounter++}`;
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Tempo de "digitando" proporcional ao tamanho da mensagem, pra parecer
+// mais natural do que um intervalo fixo curto.
+function typingDelay(text: string) {
+  const plain = text.replace(/\*\*/g, '').replace(/_/g, '');
+  return Math.min(2600, Math.max(1100, plain.length * 28));
+}
+
+function renderBotText(text: string) {
+  const paragraphs = text.split('\n\n');
+  if (paragraphs.length === 1) return formatText(text);
+  return (
+    <div className="flex flex-col gap-2.5">
+      {paragraphs.map((p, i) => (
+        <p key={i}>{formatText(p)}</p>
+      ))}
+    </div>
+  );
 }
 
 export default function ChatFlow() {
@@ -54,10 +75,10 @@ export default function ChatFlow() {
 
   async function say(text: string) {
     setIsTyping(true);
-    await delay(700);
+    await delay(typingDelay(text));
     setIsTyping(false);
     setMessages((prev) => [...prev, { id: nextId(), role: 'bot', text }]);
-    await delay(250);
+    await delay(550);
   }
 
   function sayUser(text: string) {
@@ -66,10 +87,10 @@ export default function ChatFlow() {
 
   async function runIntro() {
     await say(
-      'Empresário, não deixe que as dívidas tributárias prejudiquem o crescimento da sua empresa!'
+      'Empresário, não deixe que as **dívidas tributárias** prejudiquem o crescimento da sua empresa!'
     );
     await say(
-      'Descubra como reduzir sua dívida de maneira significativa e ainda parcelar o valor remanescente, evitando bloqueios.'
+      'Descubra como reduzir sua dívida de maneira significativa e ainda parcelar o valor remanescente, _evitando bloqueios._'
     );
     await say('Qual é o seu nome?');
     setInputStage('nome');
@@ -120,16 +141,22 @@ export default function ChatFlow() {
 
     if (qualificado) {
       trackLead();
+      await delay(900);
+      await say('Certo, estou analisando aqui o que me disse...');
+      await delay(1300);
+      await say('Olha, temos uma possibilidade interessante.');
+      await delay(1300);
       await say(
-        '🎉 Boa notícia: pelo que você nos contou, sua empresa tem indícios de elegibilidade para receber descontos de até 70%. Agende uma reunião com nosso time de especialistas:'
+        '🎉 Boa notícia: pelo que você nos contou, sua empresa tem indícios de **elegibilidade para receber descontos de até 70%.**'
       );
+      await say('Agende uma reunião com nosso time de especialistas:');
       setInputStage('final-qualified');
       setTimeout(() => {
         window.location.href = WHATSAPP_URL;
       }, AUTO_REDIRECT_MS);
     } else {
       await say(
-        'Recebemos suas informações e nossa equipe vai analisar o seu caso com atenção. Se identificarmos viabilidade para a Transação Tributária, um especialista da Sigmatax entrará em contato com você em breve.'
+        'Recebemos suas informações e nossa equipe vai **analisar o seu caso** com atenção. Se identificarmos viabilidade para a Transação Tributária, um especialista da **Sigmatax** entrará em contato com você em breve.'
       );
       setInputStage('none');
     }
@@ -137,6 +164,7 @@ export default function ChatFlow() {
 
   return (
     <div className="flex h-screen flex-col sm:h-[720px]">
+      <ChatHeader />
       <div className="flex-1 space-y-3 overflow-y-auto py-4">
         {messages.map((m, i) => {
           if (m.role === 'user') {
@@ -150,7 +178,7 @@ export default function ChatFlow() {
           const isLastInGroup = !next || next.role !== 'bot';
           return (
             <ChatBubble key={m.id} role="bot" showAvatar={isLastInGroup}>
-              {m.text}
+              {renderBotText(m.text)}
             </ChatBubble>
           );
         })}

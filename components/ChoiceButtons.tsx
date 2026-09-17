@@ -5,12 +5,12 @@ interface ChoiceButtonsProps {
 
 export default function ChoiceButtons({ options, onSelect }: ChoiceButtonsProps) {
   return (
-    <div className="flex flex-col gap-2 px-4 pb-2">
+    <div className="flex flex-col items-end gap-2.5 px-4 pb-3">
       {options.map((opt) => (
         <button
           key={opt}
           onClick={() => onSelect(opt)}
-          className="rounded-xl border border-[#d9d3f0] bg-white px-4 py-2.5 text-left text-[15px] text-[#1a1a1a] transition hover:border-[#6c4fd6] hover:bg-[#f5f2fc]"
+          className="rounded-2xl bg-[#2b4ee0] px-5 py-3 text-right text-[15px] font-bold text-white transition hover:bg-[#2340c2]"
         >
           {opt}
         </button>

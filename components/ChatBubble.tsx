@@ -10,7 +10,7 @@ export default function ChatBubble({ role, children, showAvatar }: ChatBubblePro
   if (role === 'user') {
     return (
       <div className="flex justify-end px-4">
-        <div className="max-w-[80%] rounded-2xl rounded-br-sm bg-[#111111] px-4 py-2.5 text-[15px] leading-snug text-white">
+        <div className="max-w-[80%] rounded-2xl bg-[#f2994a] px-4 py-2.5 text-[15px] leading-snug text-white">
           {children}
         </div>
       </div>
