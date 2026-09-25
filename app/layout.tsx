@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
 
-const PIXEL_ID = '1420958443465616';
+const PIXEL_ID = '1636918951122349';
 
 export const metadata: Metadata = {
   title: 'Sigmatax | Transação Tributária',
